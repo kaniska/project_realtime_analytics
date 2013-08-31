@@ -1,0 +1,129 @@
+>> STS - development environment 
+http://download.springsource.com/release/STS/2.9.2/dist/e3.7/springsource-tool-suite-2.9.2.RELEASE-e3.7.2-win32-x86_64-installer.exe
+
+
+N-Tier Web Application
+
+Tier 1 : Front end
+
+Tier 2 : Midlleware
+
+Tier 3 : Database / Message Queue
+
+<==================================>
+
+Tier 1 : Some UI Framework (ASP / JSP / JS) is used to develop the Front end
+All Front end Fwk uses - Templates, Stylesheets, CSS, Html code [common]
+
+Template : .jade template 
+
+Our web server node.jsp (like IIS / Tomcat)
+
+node.js first looks into -> layout.jade and home.jade
+
+views\home.jade :: The template for home page.
+
+public/lib/app/app.js => is the Home page.
+
+Javascript front end Fwks : JQuery / Dojo
+
+dojo.addOnLoad ...
+>> ..... show the stock symbols
+>> .... on click of a symbol..
+>> .... Http Get request  /summary/{symbol}
+
+=======================================================
+Tier 2 (its like a Servlet / Server-side ASP page )
+>> HTTP Get/Post Request Handler
+
+app.js => Starting Call
+Step 1 :
+
+// Routes
+app.get("/", function(req, resp) {
+	resp.render("home", {
+		pageTitle: "Indian Stock and Mutual Fund Analysis"
+	});
+});
+
+
+Step 2 : when a symbol is clicked
+
+app.get("/summary/:symbol", function(req, resp) {
+
+- get the symbol from the Reqest
+- Query the database to get the Summary data
+- send the data in JSON ()
+
+Step 3 : see the result in the home page
+
+>> Redeploy App
+
+- vmc delete debasmita-demo
+- vmc push
+
+vmc push -v -t
+
+vmc logs debasmita-demo
+
+vmc mem
+
+vmc stats
+
+debasmita123
+debasmita_27@yahoo.co.in
+
+========================
+
+http://docs.nodejitsu.com/articles/file-system/how-to-read-files-in-nodejs
+
+http://stackoverflow.com/questions/6831918/node-js-read-a-text-file-into-an-array-each-line-an-item-in-the-array
+
+>>>>
+
+http://divedi.blogspot.com/2004_07_01_archive.html
+http://www.wired.com/wired/archive/12.07/race.html?tw=wn_tophead_6
+
+https://dojotoolkit.org/reference-guide/1.7/quickstart/cross-domain.html#id13
+https://code.google.com/apis/ajax/playground/?type=visualization#pie_chart
+https://google-developers.appspot.com/chart/interactive/docs/gallery/gauge
+https://google-developers.appspot.com/chart/interactive/docs/gallery/linechart
+https://developers.google.com/chart/image/docs/making_charts
+https://developers.google.com/chart/interactive/docs/examples
+
+http://stackoverflow.com/questions/693621/issues-with-dojox-charting-and-xdomain-reference-to-dojo-dojox-library
+
+google.load("dojo", "1.2");
+
+==================================================
+http://css.dzone.com/articles/simple-nodejs-web-application
+http://slashdot.org/topic/bi/schemas-in-mongodb-with-node-js/
+http://backbonetutorials.com/nodejs-restify-mongodb-mongoose/
+https://github.com/LearnBoost/mongoose
+http://www.mongodb.org/display/DOCS/Querying
+http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-JavascriptExpressionsand{{%24where}}
+http://mongoosejs.com/docs/2.7.x/docs/methods-statics.html
+https://github.com/LearnBoost/mongoose
+
+>>>>  http://pixelhandler.com/blog/2012/02/09/develop-a-restful-api-using-node-js-with-express-and-mongoose/
+
+////////////////////////////////////////
+
+
+http://stackoverflow.com/questions/847185/convert-a-unix-timestamp-to-time-in-javascript
+http://stackoverflow.com/questions/2315408/how-do-i-format-a-timestamp-in-javascript-to-display-it-in-graphs-utc-is-fine
+
+http://stackoverflow.com/questions/3263842/json-to-javascript-google-charts
+http://archive.dojotoolkit.org/nightly/dojotoolkit/dojox/charting/tests/test_DataSeries.html
+
+http://stackoverflow.com/questions/3669309/display-months-in-xaxis-with-dojo
+
+http://www.hacksparrow.com/mongoskin-tutorial-with-examples.html
+
+http://www.sitepen.com/blog/2010/07/13/dive-into-dojo-charting/
+
+http://dojotoolkit.org/documentation/tutorials/1.7/charting_advanced/demo/store-series.php
+
+http://livedocs.dojotoolkit.org/dojox/charting#connecting-charts-to-data-and-specifying-a-data-series
+
+http://dojotoolkit.org/documentation/tutorials/1.6/charting_advanced/

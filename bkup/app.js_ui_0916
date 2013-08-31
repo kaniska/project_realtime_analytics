@@ -1,0 +1,300 @@
+dojo.require("dojox.widget.DialogSimple");
+dojo.require("dijit.Dialog");
+dojo.require("dojo.data.ItemFileWriteStore");
+dojo.require("dojox.charting.Chart2D");
+dojo.require("dojox.charting.widget.Chart2D");
+dojo.require("dojox.charting.themes.PlotKit.blue");
+dojo.require("dojox.charting.plot2d.Columns");
+dojo.require("dojox.charting.DataSeries");
+dojo.require("dojox.charting.Chart");
+dojo.require("dojox.charting.themes.Tom");
+dojo.require("dojox.charting.plot2d.Lines");
+dojo.require("dojox.charting.plot2d.Markers");
+
+function createTickerDetailsUI(tickerdetails){
+	
+    return dojo.when(
+    		tickerdetails,
+        function(tickerdetails){
+    			console.log("4. Show the UI : "+tickerdetails);   
+    			var foo = new dijit.Dialog({
+				    title: "My Dialog",
+				    content: tickerdetails,
+				    style: "width: 800px"
+				});
+				setTimeout(function(){
+					foo.show();
+			    }, 200);
+        },
+        function(error){
+        	var foo = new dijit.Dialog({
+			    title: "My Dialog",
+			    content: error,
+			    style: "width: 800px"
+			});
+			setTimeout(function(){
+				foo.show();
+		    }, 200);
+        }
+    );
+}
+ 
+///
+function createContent(tickerdetails) {
+	var data = dojo.toJson(tickerdetails);
+	var content =  "<table border='0' bordercolor='' style='background-color:#CCFFCC' width='500' height='200' cellpadding='5' cellspacing='3'> " +
+	 "<tr>" +
+	 "<td><p><b>Stock Summary</b> :</p>" +
+	 	" <table border='0' style='background-color:#00CC00'  width='200'>" +
+	 	" <tr> <td style='color:blue'>Max: </td><td>" + tickerdetails.max + "</td> </tr>"+
+	 	" <tr> <td style='color:blue'>Min: </td><td>" + tickerdetails.min + "</td> </tr>"+
+	 	" <tr> <td style='color:blue'>Volume: </td><td>" + tickerdetails.volume + "</td> </tr>"+
+	 	"</table> </td>" +
+	 	"<td><p><b>Stock Details</b> :</p>" +
+	 	" <table border='0' width='300'></table> </td>" +	 
+	 "</tr>"+
+	 "<tr><td colspan='2'><p><b>Stock Trend</b> :</p>" +
+	 	" <table border='0' height='100'></table> </td>" +
+	 "</tr>"+
+	 "</table>";
+
+    return content;
+}
+
+function showChart1() {
+	console.log("showing chart");
+	var data = {"identifier":"MyMonth","label":"MyMonth","items":[{"MyAmount":"98498.67","MyMonth":"1"},{"MyAmount":"114384.10","MyMonth":"2"},{"MyAmount":"125307.86","MyMonth":"3"},{"MyAmount":"87534.38","MyMonth":"4"},{"MyAmount":"90376.60","MyMonth":"5"},{"MyAmount":"96233.60","MyMonth":"6"},{"MyAmount":"112824.29","MyMonth":"7"},{"MyAmount":"119593.06","MyMonth":"8"},{"MyAmount":"95691.64","MyMonth":"9"}]};
+
+	var mystore= new dojo.data.ItemFileWriteStore({data: data});
+
+	console.log("Got data store");
+	
+	var chart1 = new dojox.charting.Chart2D('testChart').
+	    setTheme(dojox.charting.themes.PlotKit.blue).
+	    addAxis('x', {min: 0, max: 12}).
+	    addAxis('y', { vertical: true, min: 1}).
+	    addPlot('default', {type: 'Columns'}). 
+	    addSeries("My Month", new dojox.charting.DataSeries(mystore, {query:{}}, "MyMonth")).
+	    render();
+}
+
+/// https://dojotoolkit.org/reference-guide/1.8/dojox/charting.html
+function showDojoChart() {
+	//dojo.byId("chartUI").innerHTML = "<div id='chartNode' style='width:800px;height:400px;'></div>";
+	//console.log("Created the Chart Node ...");
+    // Define the data
+    var chartData = [10000,9200,11811,12000,7662,13887,14200,12222,12000,10009,11288,12099];
+    // Create the chart within it's "holding" node
+    console.log("Creating Chart Element ...");
+    dojo.byId("chartNode").style.width = "100%";
+    //var chart = new Chart("chartNode");
+    var chart = new dojox.charting.Chart2D('chartNode');
+    
+    console.log("Initialized Chart Element...");
+    
+    // Set the theme
+    //chart.setTheme(theme);
+    // Add the only/default plot 
+    chart.addPlot("default", {
+        type: "Lines",
+        markers: true
+    });
+    console.log("Added the plot to the Chart...");
+    // Add axes
+    chart.addAxis("x");
+    chart.addAxis("y", { min: 5000, max: 15000, vertical: true});
+    // Add the series of data
+    chart.addSeries("Stocks Price Time Seriese",chartData);
+    console.log("Rendering the Chart...");
+    // Render the chart!
+    chart.render();
+    console.log("Done with the Chart...");
+}
+
+function showStockPriceChart(tickertimeseriesedata) {
+	console.log("Got the data for Chart ... "tickertimeseriesedata);
+	
+	var chartData = [10000,9200,11811,12000,7662,13887,14200,12222,12000,10009,11288,12099];
+	    // Create the chart within it's "holding" node
+	    console.log("Creating Chart Element ...");
+	    dojo.byId("chartNode").style.width = "100%";
+	    //var chart = new Chart("chartNode");
+	    var chart = new dojox.charting.Chart2D('chartNode');
+	    
+	    console.log("Initialized Chart Element...");
+	    
+	    // Set the theme
+	    //chart.setTheme(theme);
+	    // Add the only/default plot 
+	    chart.addPlot("default", {
+	        type: "Lines",
+	        markers: true
+	    });
+	    console.log("Added the plot to the Chart...");
+	    // Add axes
+	    chart.addAxis("x");
+	    chart.addAxis("y", { min: 5000, max: 15000, vertical: true});
+	    // Add the series of data
+	    chart.addSeries("Stocks Price Time Seriese",chartData);
+	    console.log("Rendering the Chart...");
+	    // Render the chart!
+	    chart.render();
+	    console.log("Done with the Chart...");
+}
+
+function showGoogleChart() {
+	console.log("Show the Chart...");
+	 google.load("visualization", "1", {packages:["corechart"]});
+	 console.log("Loaded the Google Visualization...");
+     google.setOnLoadCallback(drawChart());
+}
+
+function drawChart() {
+	 console.log("Drawing the Chart...");
+   var data = google.visualization.arrayToDataTable([
+     ['Year', 'Sales', 'Expenses'],
+     ['2004',  1000,      400],
+     ['2005',  1170,      460],
+     ['2006',  660,       1120],
+     ['2007',  1030,      540]
+   ]);
+
+   var options = {
+     title: 'Company Performance'
+   };
+
+   var chart = new google.visualization.LineChart(document.getElementById('chartNode'));
+   chart.draw(data, options);
+   console.log("Done with the Chart...");
+}
+
+function handleSymbolClick(evt) {	
+	var symbol = evt.target.attributes["data"].value;
+	
+	var getTickersummary = (function(){
+	    var tickersummary;
+	    return function(){
+	        if(!tickersummary){
+	        	tickersummary = dojo.xhrGet({
+	                url: "/summary/" + symbol,
+	                handleAs: "json"
+	            });
+	        }
+	        return tickersummary;
+	    };
+	})();
+	 
+	dojo.when(getTickersummary(), function(tickersummary){
+	    // This callback will be run after the request completes
+	 
+		console.log("3. Summary Report : "+dojo.toJson(tickersummary)); 
+		dojo.byId("reportUI").innerHTML = createContent(tickersummary); 
+		// "<table> <tbody> <tr> <td> 'Hello World !' </td> </tr> </tbody> </table>";
+		console.log("Show the Ticker details in a table...");
+		
+		/// Show Chart
+		//dojo.ready(showDojoChart());
+		//showGoogleChart();	
+		
+		////  DIALOG
+		/*var foo = new dijit.Dialog({
+		    title: "My Dialog",
+		    content: dojo.toJson(tickersummary),
+		    style: "width: 800px"
+		});
+		setTimeout(function(){
+			foo.show();
+	    }, 200);*/
+		
+		/*dojo.byId("t-d-symb-val").innerHTML = symbol;
+		dojo.byId("t-d-s-p-high-val").innerHTML = dojo.toJson(tickersummary).max.toFixed(2);
+		dojo.byId("t-d-s-p-avg-val").innerHTML = dojo.toJson(tickersummary).average.toFixed(2);
+		dojo.byId("t-d-s-p-low-val").innerHTML = dojo.toJson(tickersummary).min.toFixed(2);
+		dojo.byId("t-d-v-val").innerHTML = dojo.toJson(tickersummary).volume;
+
+		var dpStyle = dojo.style("ticker-detail");
+		if(dpStyle["opacity"] == "0") {
+			dojo.fadeIn({ node: "ticker-detail" }).play();
+		}*/
+		
+	});
+	
+	/////
+	var getTickerTimeserieseData = (function(){
+	    var tickertimeseriesedata;
+	    return function(){
+	        if(!tickertimeseriesedata){
+	        	tickertimeseriesedata = dojo.xhrGet({
+	                url: "/chartdata/" + symbol,
+	                handleAs: "json"
+	            });
+	        }
+	        return tickertimeseriesedata;
+	    };
+	});
+	
+	//dojo.when(getTickerTimeserieseData(), function(tickertimeseriesedata){
+	    // This callback will be run after the request completes
+		//console.log("Show the Ticker details in a Chart...");
+		// Show Chart
+		//dojo.ready(showStockPriceChart(tickertimeseriesedata));
+	//});
+}
+
+
+
+dojo.addOnLoad(function() {
+	var socket = new io.Socket();
+	socket.connect();
+	socket.on("message", function(msg) {
+	//	var jade = require('jade');
+		var data = dojo.fromJson(msg);
+		var html = dojo.byId("ticker-symbols").innerHTML;
+		dojo.byId("ticker-symbols").innerHTML = "<div class='ticker-data'>" +
+				"<div class='ticker-symbol'><a class='ticker-symb-link' href='#' data='" + data.symbol + "' title='Stock Symbol Analysis'>" + data.symbol + "</a></div>" +
+				"<div class='ticker-meta ticker-price'>Price: $" + data.price + "</div>" +
+				"<div class='ticker-meta ticker-volume'>Volume: " + data.volume + "</div>" +
+			"</div>" + html;
+
+		/*var tableContent = dojo.byId("pet-template").innerHTML;
+	      var fn = jade.compile(tableContent);
+	      var locals = { pet: { name: 'Tobi', species: 'Ferret', age: 2, siblings: ['Loki', 'Jane'] }};
+	      var tableContent = fn(locals);
+	      document.getElementById('pets').innerHTML = tableContent;*/
+		
+		console.log("pre click-event stage ...");
+		
+		dojo.query(".ticker-symb-link").onclick(handleSymbolClick);
+
+		console.log("post click-event stage ...");
+		
+		var nodes = dojo.query("#ticker-symbols .ticker-data")
+		var total = 0;
+		var d = dojo;
+		var lastWidth = 0;
+
+		nodes.forEach(function(node, index, nodes) {
+			var style = d.getComputedStyle(node);
+			var width = parseInt(style.width.replace(/px/, ""));
+			total += width;
+			lastWidth = width;
+		});
+		total += lastWidth;
+
+		var newRight = (lastWidth * -1);
+		dojo.style("ticker-symbols", {
+			width: (total + (total/2)) + "px", 
+			right: newRight + "px"
+		});
+		dojo.anim("ticker-symbols", {
+			right: {
+				start: newRight,
+				end: 16,
+				unit: "px"
+			}
+		});
+		///////////////////////////
+	});
+	
+});
+

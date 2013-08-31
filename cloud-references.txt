@@ -1,0 +1,231 @@
+Main Reference :  
+
+http://blog.springsource.com/2011/05/03/using-mongodb-redis-node-js-and-spring-mvc-in-a-single-cloud-foundry-application/
+
+https://github.com/SpringSource/cloudfoundry-samples/tree/master/ticker-analysis/node-ticker-analysis
+
+http://docs.cloudfoundry.com/services/mongodb/nodejs-mongodb.html
+
+http://musings-on-technology.blogspot.com/2011/05/cloudfoundry-simplicity-matters.html
+
+Latest blog : http://blog.cloudfoundry.com/2012/05/17/node-activity-streams-app-1/
+
+
+============================================
+
+kaniska.mandal@gmail.com
+debasmita123
+
+DOJO Techniques :
+
+1. http://dojotoolkit.org/documentation/tutorials/1.6/promises/
+2. http://dojotoolkit.org/reference-guide/1.7/dojo/query.html
+
+http://dojotoolkit.org/reference-guide/1.7/dojo/xhrGet.html#see-also
+: Examples
+
+	      _id: { type: String },
+	timestamp: { type: Number },
+	      max: { type: Number },
+	      min: { type: Number },
+	  average: { type: Number },
+	   volume: { type: Number }
+
+http://dojotoolkit.org/documentation/tutorials/1.6/promises/
+
+>>>>>>
+
+var getUserList = (function(){
+    var users;
+    return function(){
+        if(!users){
+            return dojo.xhrGet({
+                url: "users-mangled.json",
+                handleAs: "json"
+            }).then(function(res){
+                // Save the resulting array into the users variable
+                users = dojo.map(res, function(user){
+                    return {
+                        id: user[0],
+                        username: user[1],
+                        name: user[2]
+                    };
+                });
+ 
+                // Make sure to return users here,
+                // for valid chaining
+                return users;
+            });
+        }
+        return users;
+    };
+})();
+ 
+dojo.when(getUserList(), function(users){
+    // This callback will be run after the request completes
+ 
+    var userlist = dojo.byId("userlist1");
+    dojo.forEach(users, function(user){
+        dojo.create("li", {
+            innerHTML: dojo.toJson(user)
+        }, userlist);
+    });
+ ====================
+
+http://stackoverflow.com/questions/10734169/anonymous-js-function-with-xhrpost-dojo-not-returning-data
+
+===================================================
+
+NODE.js - handle chunks in response 
+>> http.get(options, function(resp){
+  resp.on('data', function(chunk){
+    //do something with chunk
+  });
+}).on("error", function(e){
+  console.log("Got error: " + e.message);
+});
+
+
+http://blog.mongodb.org/post/6587009156/cloudfoundry-mongodb-and-nodejs
+
+CF : node.js configuration (latest) : https://github.com/gatesvp/cloudfoundry_node_mongodb/blob/master/app.js.4
+
+Why choosing node.js : http://blog.cloudfoundry.com/2012/06/27/future-proofing-your-apps-cloud-foundry-and-node-js/
+
+all js make things very fast and easy !
+
+
+===============
+
+Dialog & UI
+
+http://dojotoolkit.org/reference-guide/1.7/dijit/Dialog.html#dijit-dialog
+
+===============================================
+
+mongoose query :
+
+http://mongoosejs.com/docs/finding-documents.html
+
+http://mongoosejs.com/docs/api.html
+
+https://github.com/LearnBoost/mongoose/blob/master/test/query.test.js
+
+http://mongodb.github.com/node-mongodb-native/markdown-docs/collections.html#collection-objects
+
+var q = new Query();
+q.where('parts.weight').gt(1000;
+q.asc('name') // sorts robots by name, ascending
+
+robots_model.find(q, function(err, robots){
+  for(var r in robots){ 
+    var robot = robots[r];
+    console.log('robot: ' + robot.name);
+    for (var p in robots.parts){
+       console.log('part ' + p.name + ' weighs ' + p.weight);
+    }
+  }
+}
+
+https://github.com/jeffdonthemic/Chow-Finder-API/blob/master/app.js
+================================
+
+Analytics : Find min & max :
+http://cookbook.mongodb.org/patterns/finding_max_and_min_values_for_a_key/
+
+reduce = function (key, values) {
+    var res = values[0];
+    for ( var i=1; i<values.length; i++ ) {
+        if ( values[i].min.page_views < res.min.page_views ) 
+           res.min = values[i].min;
+        if ( values[i].max.page_views > res.max.page_views ) 
+           res.max = values[i].max;
+    }
+    return res;
+}
+
+Model.findOne({ field1 : 1 }).sort(last_mod, 1).run( function(err, doc) {
+     var max = doc.last_mod;
+});
+>> http://www.mongodb.org/display/DOCS/min+and+max+Query+Specifiers
+>> http://stackoverflow.com/questions/10572592/get-max-value-in-mongoose
+>> http://stackoverflow.com/questions/5794834/how-to-access-a-preexisting-collection-with-mongoose
+
+https://github.com/LearnBoost/mongoose/blob/master/examples/schema.js
+
+================================
+
+Technique to create the document if it does not exist : 
+ContactSchema.connection.findOne({phone: request.phone}, function(err, contact) {
+    if(!err) {
+        if(!contact) {
+            contact = new ContactSchema();
+            contact.phone = request.phone;
+        }
+        contact.status = request.status;
+        contact.save(function(err) {
+            if(!err) {
+                console.log("contact " + contact.phone + " created at " + contact.createdAt + " updated at " + contact.updatedAt);
+            }
+            else {
+                console.log("Error: could not save contact " + contact.phone);
+            }
+        });
+    }
+});
+http://stackoverflow.com/questions/7267102/how-do-i-update-upsert-a-document-in-mongoose
+==========================================
+
+CF : mongodb latest connection info :
+
+https://github.com/SpringSource/cloudfoundry-samples/blob/master/hello-spring-mongodb/src/main/resources/root-context.xml
+
+
+
+
+==============================================
+
+CF : VMC commands reference : 
+
+http://docs.cloudfoundry.com/tools/vmc/vmc-quick-ref.html#logging-in-and-managing-accounts
+
+http://docs.cloudfoundry.com/tools/deploying-apps.html#using-vmc
+
+CF : https://github.com/SpringSource/cloudfoundry-samples/wiki
+
+===========================
+
+MapReduce
+
+http://wmilesn.com/2011/07/code/how-to-map-reduce-with-mongoose-mongodb-express-node-js/
+http://kylebanker.com/blog/2009/12/mongodb-map-reduce-basics/
+http://stackoverflow.com/questions/8843264/mongoose-mapreduce
+
+http://stackoverflow.com/questions/4299991/how-to-sort-in-mongoose
+
+http://blog.serverdensity.com/2012/05/23/goodbye-global-lock-mongodb-2-0-vs-2-2/
+
+http://mongoosejs.com/docs/api.html#model_Model-mapReduce
+>>>>>>>>>>>>
+
+DOJO + Jade >> http://www.minoraddition.com/2012/05/09/virtual-scrolling-with-dgrid-dojo-dgrid-node-js-and-mongodb/#comment-455
+//////////////////
+DOjo Reference : 
+https://github.com/visionmedia/jade#a6-9
+http://naltatis.github.com/jade-syntax-docs/#text
+https://github.com/visionmedia/jade/blob/master/examples/dynamicscript.js
+https://github.com/visionmedia/jade/blob/master/examples/code.jade
+http://jade-lang.com/
+https://github.com/visionmedia/jade/blob/master/examples/browser_simple.html
+
+https://github.com/visionmedia/jade/blob/master/examples/browser.html
+https://github.com/visionmedia/jade/blob/master/examples/layout.jade
+
+https://github.com/kitsonk/kitsonkelly.com
+
+https://github.com/monteslu
+
+http://japhr.blogspot.com/2010/08/jade-templating.html
+
+http://vimeo.com/13957000
+http://www.minoraddition.com/2012/05/09/virtual-scrolling-with-dgrid-dojo-dgrid-node-js-and-mongodb/#comment-455

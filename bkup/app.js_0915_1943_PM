@@ -1,0 +1,352 @@
+var sys      = require("sys");
+var util     = require("util");
+// Use locally-installed modules
+require.paths.unshift('./node_modules');
+// Cloud Foundry
+var cf       = require("cloudfoundry");
+// MongoDB
+var mongoose = require("mongoose"),
+    Schema   = mongoose.Schema,
+    ObjectId = Schema.ObjectId,
+    DocumentObjectId = mongoose.Types.ObjectId;
+// Redis
+var redis    = require("redis");
+// Express
+var express  = require("express");
+var app      = express.createServer();
+// Configure the app
+app.configure(function() {
+	app.use(express.methodOverride());
+	app.use(express.bodyParser());
+	app.use(app.router);	
+	app.use(express.static(__dirname + '/public'));
+	
+	app.set('view engine', 'jade');
+	app.set('running in cloud', cf.isRunningInCloud());
+
+	if(!cf.isRunningInCloud()) {
+		// Only use this in public for samples or development
+		app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
+	}
+});
+// Socket.IO (sort of :)
+var io       = require("socket.io").listen(app, {
+	transports: ['xhr-polling'], 
+	transportOptions: {
+		'xhr-polling': {duration: 10000}
+	} 
+});
+
+
+//Mongoose Models
+var TickerEventSchema = new Schema({
+	symbol: { type: String },
+	 price: { type: Number },
+	volume: { type: Number }
+});
+var TickerEventModel = mongoose.model('TickerEvent', TickerEventSchema);
+
+var TickerSummarySchema = new Schema({
+	      _id: { type: String },
+	timestamp: { type: Number },
+	      max: { type: Number },
+	      min: { type: Number },
+	  average: { type: Number },
+	   volume: { type: Number }
+});
+var TickerSummaryModel = mongoose.model('TickerSummary', TickerSummarySchema);
+
+var mongoConfig = cf.getServiceConfig("mongo-connector");
+var db = mongoose.createConnection("mongodb://" + mongoConfig.username + ":" + mongoConfig.password + "@" + mongoConfig.hostname + ":" + mongoConfig.port + "/" + mongoConfig.db);
+var mongooseTypes = require("mongoose-types")
+, useTimestamps = mongooseTypes.useTimestamps;
+
+TickerEventSchema.plugin(useTimestamps);
+
+// util.debug("mongo connection: "+"mongodb://" + mongoConfig.username + ":" + mongoConfig.password + "@" + mongoConfig.hostname + ":" + mongoConfig.port + "/" + mongoConfig.db);
+// util.debug(db);
+
+
+// Connect to Redis
+var redisConfig = cf.getServiceConfig("redis-connector");
+// util.debug("redis config: "+JSON.stringify(redisConfig));
+var redisClient = redis.createClient(redisConfig.port, redisConfig.hostname);
+var redisPublisher = redis.createClient(redisConfig.port, redisConfig.hostname);
+if(redisConfig.password) {
+	redisClient.auth(redisConfig.password);
+	redisPublisher.auth(redisConfig.password);
+}
+var watchers = {};
+redisClient.subscribe("redis-connector");
+redisClient.on("message", function(channel, json) {
+	
+	util.debug("<================ START ===============>");
+	
+	var data = JSON.parse(json);
+	//var TickerEvent = db.model('TickerEvent', 'tickerdata');
+	util.debug("<============ Got the Event : "+data);
+	var te = new TickerEventModel({
+		symbol: data.symbol,
+		price: data.price,
+		volume: data.volume
+	});
+	te.save(function(err) { //// Step 1 - save the new event
+		if(err) {
+			throw(err);
+		}
+		util.debug("Step 1 : Got a Stock Symbol.."+JSON.stringify(data));
+		
+		var v_max = 0;
+		var v_min = 0;
+		var v_total = 0;
+		
+		/*var query1 = TickerEvent.find({symbol:data.symbol});
+		query1.sort('price', 1);
+		query1.exec(function(error, docs){
+			if(docs) {
+			util.debug(" Found Document "+docs[0]+" for symbol "+data.symbol);
+			}
+		});*/
+		
+		////////////// Step 2 - calculate Max
+		TickerEventModel.find({ symbol : data.symbol }).sort('price', -1).limit(1).run( function(err, doc1) {			
+		if(doc1) {
+						util.debug(" Got Document1 "+doc1[0]+" for symbol "+data.symbol);
+					     v_max = doc1[0].price;
+					     util.debug(" Got Max Val : "+v_max);
+					     
+					     /////////// Step 3 - calculate Min
+					     TickerEventModel.find({ symbol : data.symbol }).sort('price', 1).limit(1).run( function(err, doc2) {
+					    	 if(doc2) {
+							 		util.debug(" Got Document2 "+doc2[0]+" for symbol "+data.symbol);
+							 	     v_min = doc2[0].price;
+							 	     util.debug("Got Min Val : "+v_min);
+							 	     
+							 	    ////// Step 4 - calculate Volume Total
+							 	    //TickerEvent.find({ symbol : data.symbol }).run(function(err, volumeDocs) {
+							 	    //	util.debug("Trying to get Documents for calculating Volume for symbol "+data.symbol);
+								    //	 if(volumeDocs) {
+										// 		util.debug("Got Documents for calculating Volume for symbol "+data.symbol);
+										//// 		volumeDocs.forEach(function(record){
+										 //		      console.log('Record found:' + record.symbol);
+										 //		     v_total = v_total + record.volume;
+										 //		    });		
+										 		
+										 		 //////// Step 5 - calculate Summary
+											    // var Summary = db.model("TickerSummary","tickersummary");
+							 	    TickerSummaryModel.findOne({ _id: data.symbol }, function (err, doc3){
+											 		/*if(!err) {
+											 			util.debug("Found Summary " + JSON.stringify(doc));
+											         }
+											         else {
+											         	util.debug("Error: could not save Summary for " + data.symbol);
+											         }*/
+												 		if(!doc3) {
+												 			util.debug("Event : Create new Summary document ");
+												 			doc3 = new Summary();
+												 			doc3._id = data.symbol;
+												 		}
+											 				
+											 		  doc3.timestamp = 1234;
+											 		  doc3.max = v_max;
+											 		  doc3.min = v_min;
+											 		  doc3.volume =  doc3.volume + data.volume;
+											 		  doc3.save();
+											 		  
+											 		  util.debug("Step 4 : Saved the summary.."+JSON.stringify(doc3));
+											 		  
+											 		  util.debug("<================ END ===============>");
+											 		}); // End Of Step 5
+								    	// }
+							 	   // });// End of Step 4
+					    	 }
+					 	}); // End Step-3 Calculate Min			
+			}		     
+		}); // ///// Step 2 - calculate Max				
+	}); // End -  Step 1 - save the new event
+
+/*	var ts = new Summary({
+		_id: data.symbol,
+		timestamp: 111,
+	      max: 111,
+	      min: 12,
+	  average: 50,
+	   volume: data.volume
+	});
+	ts.save(function(err) {
+		if(err) {
+			throw(err);
+		}
+		util.debug("mongo details: "+JSON.stringify(data));
+	});*/
+	
+	io.broadcast(json);
+});
+
+var SYMBOLS = [
+            	"Reliance_Info_Comm",
+            	"Tata_Steel",
+            	"Wipro",
+            	"InfoSys"
+            	];
+
+// Make up ticker information at random
+var SYMBOLS1 = [
+	"DSA",
+	"YZI",
+	"KRQ",
+	"HWW",
+	"TXE",
+	"DMT",
+	"DSA",
+	"HVF",
+	"UWB",
+	"MDL",
+	"EAA",
+	"SWL",
+	"OX",
+	"DYP",
+	"DSA",
+	"WVL",
+	"DPN",
+	"WRB",
+	"MI",
+	"HWW",
+	"FCI",
+	"BIW",
+	"PWK",
+	"IAO",
+	"MYD",
+	"EBF",
+	"JTX",
+	"XWE",
+	"HWW",
+	"PRU",
+	"HQG",
+	"UVZ",
+	"MXT",
+	"YPB",
+	"OJY",
+	"FVC",
+	"URI",
+	"GVD",
+	"DMQ",
+	"HWW",
+	"UCJ",
+	"QWW"
+];
+function getRandomSymbol() {
+	var index = Math.round(Math.random() * SYMBOLS.length);
+	if(index) {
+		return SYMBOLS[index];
+	} else {
+		return getRandomSymbol();
+	}
+}
+
+function getRandomPrice(lastPrice) {
+	if(lastPrice) {
+		return (Math.random() * (lastPrice * 2)).toFixed(2);
+	} else {
+		return (Math.random() * 100).toFixed(2);
+	}
+}
+
+function getRandomVolume() {
+	var vol = Math.round(Math.random() * 10);
+	if(vol == 0) {
+		return 1;
+	}
+	return vol;
+}
+
+var tickerSender;
+function sendTickerEvent() {
+	var symbolInfo = {
+		symbol: getRandomSymbol(), 
+		price: getRandomPrice(),
+		volume: getRandomVolume()
+	};
+	// util.debug("sending ticker event: " + JSON.stringify(symbolInfo));
+	//if(symbolInfo.symbol != 'undefined') {
+		redisPublisher.publish("redis-connector", JSON.stringify(symbolInfo));
+	//}
+	
+	var timeout = Math.round(Math.random() * 12000);
+	if(timeout < 3000) {
+		timeout += 10000;
+	}
+	tickerSender = setTimeout(sendTickerEvent, timeout);
+}
+
+// Routes
+app.get("/", function(req, resp) {
+	resp.render("home", {
+		pageTitle: "Indian Stock and Mutual Fund Analysis"
+	});
+});
+
+app.get("/summary/:symbol", function(req, resp) {	
+	/*mongoose.connection.on("open", function(){
+		util.debug("mongodb is connected!!");
+		});*/
+	
+	//util.debug("found symbol ..." + req.params.symbol);
+	
+	//var TickerSummary = db.model("TickerSummary", "tickersummary");
+	TickerSummaryModel.findById(req.params.symbol, function(err, data) {
+		if(err) {
+			throw(err);
+		}
+		util.debug("Event 3 : Got the Summary "+JSON.stringify(data));
+		resp.send(JSON.stringify(data));
+	});
+	
+	/*var TickerSummary = db.model("TickerSummary", "tickersummary");	
+	TickerSummary.find({}, ['_id', 'volume'], function (err, docs) {
+		if(err) {
+			throw(err);
+		}
+		util.debug("found  ticker events : "+JSON.stringify(data)); 
+		})
+	
+	TickerSummary.findOne({_id : req.params.symbol}, function(err, data) {
+		if(err) {
+			throw(err);
+		}
+		util.debug("found data: "+JSON.stringify(data));
+		resp.send(JSON.stringify(data));
+	});*/
+});
+
+app.get("/chartdata/:symbol", function(req, resp) {
+	//var TickerEvent = db.model("TickerEvent");
+	TickerEventModel.find({}, function(err, d1) {
+		if(err) {
+			throw(err);
+		}
+		util.debug("Testing all data ..."+d1);
+		
+		TickerEventModel.find({ "symbol" : req.params.symbol}, function(err, chartdata) {
+			if(err) {
+				throw(err);
+			}
+			util.debug("Got the Chart data ..."+chartdata);
+			resp.send(JSON.stringify(chartdata));
+		});
+		
+	});
+	
+});
+
+
+// Ticker Stream
+io.on("connection", function(client) {
+	if(!tickerSender) {
+		sendTickerEvent();
+	}
+	// util.debug("connection made..." + client);
+});
+
+// Listen for requests
+app.listen(cf.getAppPort());

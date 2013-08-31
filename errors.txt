@@ -1,0 +1,7 @@
+[00:24:42.716] (new ReferenceError("Chart is not defined", "http://data-warehouse-demo.cloudfoundry.com/lib/app/app.js", 85)) @ http://ajax.googleapis.com/ajax/libs/dojo/1.6/dojo/dojo.xd.js:14
+
+Fix :
+
+http://poop.me.uk/~phenny/logs/dojo/2010/09/14.html
+
+http://www.birt-exchange.org/org/forum/index.php/topic/27617-chart-rendering-difference-in-iefirefox/

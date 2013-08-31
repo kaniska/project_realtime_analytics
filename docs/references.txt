@@ -1,0 +1,30 @@
+DOJO Techniques :
+
+1. http://dojotoolkit.org/documentation/tutorials/1.6/promises/
+2. http://dojotoolkit.org/reference-guide/1.7/dojo/query.html
+
+
+	      _id: { type: String },
+	timestamp: { type: Number },
+	      max: { type: Number },
+	      min: { type: Number },
+	  average: { type: Number },
+	   volume: { type: Number }
+
+
+http://blog.mediarain.com/2012/02/the-socket-io-protocol/
+
+http://techoctave.com/c7/posts/60-simple-long-polling-example-with-javascript-and-jquery
+
+http://www.ibm.com/developerworks/web/library/wa-reverseajax3/index.html
+
+http://socket.io/
+
+
+var fs = require('fs');
+var array = fs.readFileSync('file.txt').toString().split("\n");
+for(i in array) {
+    console.log(array[i]);
+}
+
+http://docs.nodejitsu.com/articles/file-system/how-to-read-files-in-nodejs
