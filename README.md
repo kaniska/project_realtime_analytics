@@ -1,4 +1,15 @@
-project_realtime_analytics
-==========================
+# testApp
 
-Display charts and analytics reports on real-time data using cloudfoundry, node.js, dojo-toolkit, socket-io, redis and mongodb
+## Objective
+
+
+
+## Usage
+
+
+
+## Developing
+
+
+Created with [Nodeclipse v0.4](https://github.com/Nodeclipse/nodeclipse-1)
+ ([Eclipse Marketplace](http://marketplace.eclipse.org/content/nodeclipse), [site](http://www.nodeclipse.org))   

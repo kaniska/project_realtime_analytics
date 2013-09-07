@@ -1,4 +1,3 @@
-
 .note {
 	border: 1px solid #FFDDBB;
 	color: inherit;
@@ -224,7 +223,7 @@ fieldset.smalltab .buttonGroup {
 	width: 0px;
 }
 
-.stock-data {
+.stocks-data {
 	border-left: 1px solid #cccccc;
 	clear; both;
 	float: right;
@@ -233,40 +232,40 @@ fieldset.smalltab .buttonGroup {
 	padding: 0 10px 0 10px;
 }
 
-.stock-symbol {
+.stocks-symbol {
 	clear: none;
 	float: left;
 	margin: 0 10px 0 0;
 }
 
-.stock-meta {
+.stocks-meta {
 	text-align: right;
 }
 
-.stock-data .stock-symbol {
+.stocks-data .stocks-symbol {
 	font-size: 25px;
 	float: left;
 }
 
-.stock-data .stock-price {
+.stocks-data .stocks-price {
 	float: right;
 	font-size: 14px;
 	font-weight: bold;
 	width: 105px;
 }
 
-.stock-trend-nc {
+.stocks-trend-nc {
 }
 
-.stock-trend-up {
+.stocks-trend-up {
 	color: green;
 }
 
-.stock-trend-down {
+.stocks-trend-down {
 	color: red;
 }
 
-#stocks-details {
+#stocks-detail {
 	border: 1px solid #cccccc;
 	float: right;
 	height: 200px;
@@ -275,42 +274,42 @@ fieldset.smalltab .buttonGroup {
 	width: 300px;
 }
 
-#stocks-details .t-d-data {
+#stocks-detail .t-d-data {
 	font-size: 15px;
 	padding: 5px;
 }
 
-#stocks-details #t-d-symbol {
+#stocks-detail #t-d-symbol {
 	border-bottom: 1px solid #cccccc;
 	font-size: 35px;
 	margin: 0 0 10px;
 }
 
-#stocks-details #t-d-name {
+#stocks-detail #t-d-name {
 	float: right;
 	font-size: 20px;
 	line-height: 40px;
 }
 
-#stocks-details .t-d-s-price {
+#stocks-detail .t-d-s-price {
 	text-align: justify;
 }
 
-#stocks-details .t-d-s-p-label {
+#stocks-detail .t-d-s-p-label {
 	float: left;
 	text-align: right;
 	width: 50%;
 }
 
-#stocks-details .t-d-s-p-value {
+#stocks-detail .t-d-s-p-value {
 	text-align: right;
 }
 
-#stocks-details #t-d-s-price-avg {
+#stocks-detail #t-d-s-price-avg {
 	font-size: 20px;
 }
 
-#stocks-details #t-d-volume {
+#stocks-detail #t-d-volume {
 	padding: 0 10px 5px 0;
 	text-align: right;
 }

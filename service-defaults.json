@@ -1,0 +1,13 @@
+{
+  "mongo": {
+    "hostname": "localhost",
+    "port": 27017,
+    "username": "",
+    "password": "",
+    "db": "test"
+  },
+  "redis": {
+    "hostname": "localhost",
+    "port": 6379
+  }
+}

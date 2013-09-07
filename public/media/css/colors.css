@@ -1,19 +1,4 @@
-/* colors.css 2008/04/22 nicolekonicki */
-
-/*
- * COLORS CSS
- *
- * Only css that affects the colors and text decoration of elements 
- * should be included here.
- *
- */
- 
-
-/*
- * COMMON STYLES
- */
-
-  body
+body
   {
     background-color: #dfdfdf;
   }
@@ -196,8 +181,3 @@ h4 {
     color: #999;
     text-decoration:none;
   }
-
-
-
-
-

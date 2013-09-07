@@ -1,19 +1,4 @@
-/* main.css 2008/04/22 nicolekonicki */
-
-/*
- * MAIN CSS
- *
- * All css for the screen, other than color-specific styles,
- * should be included here.  Color styles should be included
- * in colors.css.
- *
- */
-
-/*
- * COMMON STYLES
- */
-
-  body
+body
   {
     font: 12px Arial, Helvetica, "Bitstream Vera Sans", sans-serif;
   }
@@ -415,13 +400,3 @@ h4 {
   	right:0;
   	float:right;
   }
-  
-  .chartStyle
-  {
-    width: 400px;
-    height: 240px;
-    margin: 30px;
-  }
-
-
-

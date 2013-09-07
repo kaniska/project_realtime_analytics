@@ -288,7 +288,6 @@ app.get("/summary/:symbol", function(req, resp) {
         }			
 	});	
 });
-
 // Fetch Stocks Stream
 		io.on("connection", function(client) {
 			if(!stocksEventSender) {
@@ -296,6 +295,6 @@ app.get("/summary/:symbol", function(req, resp) {
 			}
 			util.debug("connection made..." + client);
 		});	
-
 // Listen for requests
 app.listen(cf.getAppPort());
+
