@@ -79,40 +79,10 @@ if(redisConfig.password) {
 var watchers = {};
 redisClient.subscribe("redis-connector");
 redisClient.on("message", function(channel, json) {
-	
-	util.debug("<================ START ===============>");
-	util.debug("Incoming data ... " + json );
-	
-	var data = JSON.parse(json);
-	
-	util.debug("Parsed data ... " + data );
-	
-	var TickerEvent = db.model('StocksEventSchema2', 'stocksdata');
-	
 	//////////////////
 	
-	TickerEvent.count({}, function( err, count){   
-		util.debug( "Records Count:", count ); 
-
-		if(count < STOCKS_INFO.length) {
-			var te = new TickerEvent({
-				symbol: data.symbol,
-				price: data.price,
-				volume: data.volume
-			});
-			
-			te.save(function(err) {
-				if(err) {
-					throw(err);
-				}
-				util.debug("Step 1 : Got a Stock Symbol.."+JSON.stringify(data));
-				util.debug(te.createdAt); // Should be approximately now
-				var v_max = 0;
-				var v_min = 0;			
-			});
-
-		}
-	});
+	persistStockesEvent(json);
+	
 	util.debug( "Abbout to send data to Browser.."); 
 	io.sockets.send(json);
 	util.debug( "Sent data to Browser:", json ); 
@@ -251,6 +221,94 @@ StocksSummary2.findOne({ "symbol" : req.params.symbol}, function(err, summarydat
     }			
 });	
 });
+
+////////////////////////////////
+
+function persistStockesEvent(json){
+	var Summary = db.model('StocksSummarySchema2','stockssummaryinfo');
+	var TickerEvent = db.model('StocksEventSchema2', 'stocksdata');
+	
+	util.debug("<================ START ===============>");
+	util.debug("Incoming data ... " + json );
+	var data = JSON.parse(json);
+	util.debug("Parsed data ... " + data );
+	
+	TickerEvent.count({}, function( err, count) {   
+		util.debug( "Records Count:", count ); 
+
+		if(count < STOCKS_INFO.length) {
+			var te = new TickerEvent({
+				symbol: data.symbol,
+				price: data.price,
+				volume: data.volume
+			});	
+			
+		   te.save(function(err) {
+			if(err) {
+				throw(err);
+			}
+			util.debug("Step 1 : Got a Stock Symbol.."+JSON.stringify(data));
+			util.debug(te.createdAt); // Should be approximately now
+			var v_max = 0;
+			var v_min = 0;
+					
+		////////////// Step 1 - calculate Max
+		TickerEvent.find({ symbol : data.symbol }).sort({price: -1}).limit(1).exec( function(err, doc1) {			
+		  if(doc1) {
+		    util.debug(" Got Document1 "+doc1[0]+" for symbol "+data.symbol);
+		    v_max = doc1[0].price;
+		    util.debug(" Got Max Val : "+v_max);
+							 
+		/////////// Step 3 - calculate Min
+		TickerEvent.find({ symbol : data.symbol }).sort({price: -1}).limit(1).exec( function(err, doc2) {
+		   if(doc2) {
+		     util.debug(" Got Document2 "+doc2[0]+" for symbol "+data.symbol);
+		     v_min = doc2[0].price;
+		     util.debug("Got Min Val : "+v_min);
+					 
+		//////// Step 4 - calculate Summary			
+		Summary.find({ symbol : data.symbol }).limit(1).exec(function (err, doc3){
+		    if(!err) {
+			 util.debug("Found Summary " + doc3[0]);
+			}else {
+		 	 util.debug("Error: could not find Summary for " + data.symbol);
+			}
+			if(!doc3 || doc3.length == 0) {
+			  util.debug("Event : Create new Summary document ");
+			  var summaryDoc = new Summary();
+			  summaryDoc.symbol = data.symbol;		
+			  summaryDoc.timestamp = 1234;
+			  summaryDoc.max = v_max;
+			  summaryDoc.min = v_min;
+			  summaryDoc.volume = data.volume;
+
+			  summaryDoc.save(function(err) {
+		            if(err) {
+			         throw(err);
+			        }
+			  });							 			
+			}else {
+			  doc3[0].symbol = data.symbol;		
+			  doc3[0].timestamp = 1234;
+			  doc3[0].max = v_max;
+			  doc3[0].min = v_min;
+			  doc3[0].volume = doc3[0].volume + data.volume;
+		          doc3[0].save();
+			
+		          util.debug("Step 4 : Saved the summary.."+JSON.stringify(doc3[0]));
+			}
+			util.debug("<================ END ===============>");
+		   
+	      }); // End of Summary Calculation 
+	     }
+	    }); // End of Min Calculation
+	   }				 
+	  });	// End of Max Calculation
+	 });// End of Save Operation
+	} 
+  });// End of Count Operation
+}
+
 
 /////////////////////////////////
 
