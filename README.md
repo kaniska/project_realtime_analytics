@@ -2,13 +2,16 @@
 
 ## Objective
 
-
+Initially the application was developed using cloudfoundry,
+then changed to make it work with mongodb and redis in a local ubuntu box.
 
 ## Usage
-node server.js
+( mongodb version 2.4.6 )
+> service mongodb start
+> /tools/redis-stable/src/sudo service redis-server start
+> node server.js
 
 http://localhost:3000/
-
 
 ## Developing
 
